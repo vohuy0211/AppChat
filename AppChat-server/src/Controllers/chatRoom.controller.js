@@ -1,23 +1,22 @@
-import chatModel from '../Models/message.model.js';
-import User from '../Models/user.model.js';
+import chatModel from "../Models/message.model.js";
+import User from "../Models/user.model.js";
 
 class chatController {
   async handlePostChat(req, res) {
     try {
       const { text, userId } = req.body;
 
-
       const newMessage = await chatModel.create({
         text,
         userId,
       });
 
-      req.app.get("io").emit('chatMessage', newMessage);
+      req.app.get("io").emit("chatMessage", newMessage);
 
       res.status(200).json({
         message: "Tin nhắn đã gửi thành công",
         data: newMessage,
-      })
+      });
     } catch (error) {
       console.error("Lỗi khi lưu tin nhắn:", error);
       res.status(500).json({
@@ -33,14 +32,17 @@ class chatController {
         include: [
           {
             model: User,
-            attributes: ['username'],
+            attributes: ["username"],
           },
         ],
-        order: [['createdAt', 'ASC']],
+        order: [["createdAt", "ASC"]],
       });
 
       const localMessages = allMessages.map((message) => {
-        const localDate = new Date(message.createdAt.getTime() - message.createdAt.getTimezoneOffset() * 60000);
+        const localDate = new Date(
+          message.createdAt.getTime() -
+            message.createdAt.getTimezoneOffset() * 60000,
+        );
         return {
           ...message.toJSON(),
           createdAt: localDate.toISOString(),
@@ -60,6 +62,5 @@ class chatController {
     }
   }
 }
-
 
 export default new chatController();

@@ -5,8 +5,10 @@ export class ChatAPI {
     const url = "api/v1/chatRoom/postChat";
     return axiosClient.post(url, data);
   }
-  static getAllMessage(data) {{
-    const url = "api/v1/chatRoom/getAllChat";
-    return axiosClient.get(url, data);
-  }}
+  static getAllMessage(data) {
+    {
+      const url = "api/v1/chatRoom/getAllChat";
+      return axiosClient.get(url, data);
+    }
+  }
 }

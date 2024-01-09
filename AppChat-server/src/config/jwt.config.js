@@ -1,3 +1,3 @@
-const sceretKey = 'huydeptrai';
+const sceretKey = "huydeptrai";
 
 export default sceretKey;

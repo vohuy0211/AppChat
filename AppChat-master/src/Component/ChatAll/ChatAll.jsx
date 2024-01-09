@@ -13,16 +13,10 @@ import styles from "./ChatAll.module.css"
 import { IoIosSend } from "react-icons/io";
 import { ChatAPI } from "../../api/chatRoom";
 import { io } from "socket.io-client";
-const socket = io(window.location.origin, {
-  transports: ['websocket'],
-  upgrade: false,
-  query: {
-    debug: 'socket.io:*',
-  },
-});
 
 function ChatAll() {
-  const [messages, setMessages] = useState([]);
+  const socket = io(window.location.origin);
+  const [ messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [dataMsg, setDataMsg] = useState([]);
 
@@ -37,7 +31,7 @@ function ChatAll() {
 
   useEffect(() => {
     handleGetAllMsg()
-  }, [])
+  }, [dataMsg])
 
   const userId = JSON.parse(localStorage.getItem('user'));
 
@@ -48,8 +42,7 @@ function ChatAll() {
         userId: userId.id,
       });
 
-      socket.emit("chatMessage", response.data.data);
-      setMessages(response.data.data);
+      setMessages([...messages, response.data.data]);
       setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -58,9 +51,8 @@ function ChatAll() {
 
   useEffect(() => {
     socket.on("chatMessage", (message) => {
-      setMessages(message);
+      setMessages([...messages, message]);
     });
-
     return () => {
       socket.off("chatMessage");
     };
@@ -69,6 +61,7 @@ function ChatAll() {
 
   return (
     <MDBContainer className="py-5">
+    <h1>Welcome {userId.username}</h1>
       <MDBRow className="d-flex justify-content-center">
         <MDBCol md="8" lg="6" xl="4">
           <MDBCard id="chat1" style={{ borderRadius: "15px" }}>
@@ -94,19 +87,19 @@ function ChatAll() {
                   </li>
                 </div>
               ))}
-              <MDBTextArea
-                className={styles.msgChat}
-                label="Type your message"
-                id="textAreaExample"
-                rows={4}
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-              />
-              <button className={styles.btn}
-                onClick={sendMessage}>
-                <IoIosSend />
-              </button>
             </MDBCardBody>
+            <MDBTextArea
+              className={styles.msgChat}
+              label="Type your message"
+              id="textAreaExample"
+              rows={4}
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+            />
+            <button className={styles.btn}
+              onClick={sendMessage}>
+              <IoIosSend />
+            </button>
           </MDBCard>
         </MDBCol>
       </MDBRow>

@@ -1,5 +1,5 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {AuthAPI} from "../../api/auth";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { AuthAPI } from "../../api/auth";
 
 export const registerUser = createAsyncThunk(
   "user/fetchUserData",
@@ -8,7 +8,7 @@ export const registerUser = createAsyncThunk(
       ...inputValue,
     };
     await AuthAPI.registerData(newUser);
-  }
+  },
 );
 
 export const handleLogin = createAsyncThunk(
@@ -20,7 +20,7 @@ export const handleLogin = createAsyncThunk(
     localStorage.setItem("user", JSON.stringify(response.data.data));
     localStorage.setItem("token", response.data.accessToken);
     return response;
-  }
+  },
 );
 
 const userSlice = createSlice({
@@ -41,6 +41,6 @@ const userSlice = createSlice({
   },
 });
 
-const {reducer} = userSlice;
+const { reducer } = userSlice;
 
 export default reducer;
