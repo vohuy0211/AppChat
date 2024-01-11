@@ -25,9 +25,6 @@ const Message = sequelize.define(
 Message.belongsTo(User, { foreignKey: "userId" });
 User.hasMany(Message, { foreignKey: "userId" });
 
-Message.belongsTo(User, { foreignKey: "receiverId", as: "receiver" });
-User.hasMany(Message, { foreignKey: "receiverId", as: "receivedMessages" });
-
 Message.belongsTo(Room, { foreignKey: "roomId" });
 Room.hasMany(Message, { foreignKey: "roomId" });
 

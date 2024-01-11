@@ -1,28 +1,30 @@
-// import sequelize from "../libs/connect.mySQL.js";
-// import { DataTypes } from "sequelize";
-// import Room from "./room.model.js";
-// import User from "./user.model.js";
+import sequelize from "../libs/connect.mySQL.js";
+import { DataTypes } from "sequelize";
+import Room from "./room.model.js";
+import User from "./user.model.js";
 
-// const UserRoom = sequelize.define(
-//     "UserRoom",
-//     {
-//         id: {
-//             type: DataTypes.INTEGER,
-//             autoIncrement: true,
-//             allowNull: false,
-//             primaryKey: true,
-//         }
-//     },
-//     {
-//         timestamps: true,
-//     },
-// );
+const UserRoom = sequelize.define("UserRoom", {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true,
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    roomId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+});
 
-// UserRoom.belongsTo(User, { foreignKey: 'userId'});
-// UserRoom.belongsTo(Room, { foreignKey: 'conversationId' });
+Room.belongsToMany(User, { through: UserRoom });
+User.belongsToMany(Room, { through: UserRoom });
 
-// UserRoom.sync().then(() => {
-//     console.log("tạo bảng user thành công");
-// });
+UserRoom.sync().then(() => {
+    console.log("Tạo bảng trung gian thành công");
+});
 
-// export default UserRoom;
+export default UserRoom;

@@ -8,6 +8,10 @@ const Room = sequelize.define("Room", {
         allowNull: false,
         primaryKey: true,
     },
+    users: {
+        type: DataTypes.STRING,
+        unique: true,
+    }
 });
 
 Room.sync().then(() => {
