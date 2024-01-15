@@ -8,9 +8,19 @@ const Room = sequelize.define("Room", {
         allowNull: false,
         primaryKey: true,
     },
-    users: {
-        type: DataTypes.STRING,
-        unique: true,
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    receiverId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    }
+}, {
+    uniqueKeys: {
+        uniqueRoom: {
+            fields: ['userId', 'receiverId']
+        }
     }
 });
 

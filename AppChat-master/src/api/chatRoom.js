@@ -6,9 +6,7 @@ export class ChatAPI {
     return axiosClient.post(url, data);
   }
   static getAllMessage(data) {
-    {
       const url = "api/v1/chatRoom/getAllChat";
       return axiosClient.get(url, data);
-    }
   }
 }

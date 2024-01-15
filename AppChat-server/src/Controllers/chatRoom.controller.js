@@ -1,5 +1,6 @@
 import chatModel from "../Models/message.model.js";
 import User from "../Models/user.model.js";
+import UserRoom from "../Models/userRoom.model.js";
 
 class chatController {
   async handlePostChat(req, res) {

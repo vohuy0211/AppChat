@@ -43,7 +43,7 @@ function Login() {
         password: inputValue.password,
       };
       await dispatch(handleLogin(payload)).unwrap();
-      navigate("/ChatAll");
+      navigate("/chat");
     } catch (error) {
       setError("Sai tài khoản hoặc mật khẩu");
       console.log(error.message);

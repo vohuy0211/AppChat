@@ -9,15 +9,7 @@ const UserRoom = sequelize.define("UserRoom", {
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
-    },
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
-    roomId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
+    }
 });
 
 Room.belongsToMany(User, { through: UserRoom });

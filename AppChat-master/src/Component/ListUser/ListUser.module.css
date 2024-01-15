@@ -1,0 +1,50 @@
+.wrapperNavbarItem li {
+    list-style-type: none;
+    color: white;
+    padding: 30px 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 17px;
+}
+
+.wrapperNavbarItem li:hover {
+    color: #f9c300;
+    cursor: pointer;
+    background-color: #2a4b6c; 
+}
+
+.wrapperNavbar {
+    background-color: #1367a2;
+    width: 550px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    align-content: space-between;
+    user-select: none;
+}
+
+.wrapperNavbar h1 {
+    color: white;
+    text-align: center;
+}
+
+.wrapperNavbarItem div h2 {
+    color: white;
+    text-align: left;
+    margin-top: 40px;
+    cursor: pointer;
+}
+
+.wrapperNavbarItem li a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+.wrapperNavbarItem li a:hover {
+    color: #f9c300;
+    text-decoration: underline; 
+}

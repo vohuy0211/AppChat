@@ -21,7 +21,7 @@ class userController {
       });
 
       res.status(200).json({ msg: "Register Successfully", user });
-    } catch (error) {}
+    } catch (error) { }
   }
 
   async handleLogin(req, res) {
@@ -45,6 +45,32 @@ class userController {
       }
     } catch (error) {
       res.status(404).json(error.message);
+    }
+  }
+
+  async handleGetAllUser(req, res) {
+    try {
+      const allUsers = await userModel.findAll();
+      res.status(200).json({ data: allUsers });
+    } catch (error) {
+      res.status(500).json({ msg: "Internal Server Error" });
+    }
+  }
+
+  async handleGetUserById(req, res) {
+    try {
+      const userId = req.params.id;
+
+      const user = await userModel.findByPk(userId);
+
+      if (!user) {
+        return res.status(404).json({ msg: "Không tìm thấy người dùng với id đã cho" });
+      }
+
+      res.status(200).json({ msg: "Người dùng đã được tìm thấy", data: user });
+    } catch (error) {
+      res.status(500).json({ msg: "Lỗi" });
+      console.log(error);
     }
   }
 }
