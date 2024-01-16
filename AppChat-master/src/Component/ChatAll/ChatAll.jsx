@@ -25,36 +25,21 @@ function ChatAll() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [dataMsg, setDataMsg] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+ 
 
-  const handleGetAllMsg = async (page) => {
+  const handleGetAllMsg = async () => {
     try {
-      const response = await ChatAPI.getMessagesByIdRoom(id ,page);
+      const response = await ChatAPI.getMessagesByIdRoom(id);
       setDataMsg(response.data.data.messages)
-      setMessages((prevMessages) => [...prevMessages, ...response.data.data.messages]);
-      setCurrentPage(response.data.data.currentPage);
-      setTotalPages(response.data.data.totalPages);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    handleGetAllMsg(currentPage)
+    handleGetAllMsg()
   }, [dataMsg])
 
-  const handleLoadMore = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handleLoadLess = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
 
   const userId = JSON.parse(localStorage.getItem('user'));
 
@@ -66,7 +51,7 @@ function ChatAll() {
         roomId: id,
       });
 
-      setMessages((prevMessages) => [...prevMessages, response.data.data]);
+      setMessages([...messages, response.data.data]);
       setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -114,7 +99,7 @@ function ChatAll() {
               >
                 {message.userId !== userId.id && (
                   <Avatar
-                    name={message.User.username}
+                    name={message.User.username} 
                     className={styles.avt}
                   />
                 )}
@@ -134,7 +119,7 @@ function ChatAll() {
                 </MDBCard>
                 {message.userId === userId.id && (
                   <Avatar
-                    name={message.User.username}
+                    name={message.User.username} 
                     className={styles.avt}
                   />
                 )}
@@ -152,30 +137,6 @@ function ChatAll() {
             <MDBBtn color="info" rounded className="float-end" onClick={() => sendMessage(id)}>
               Send
             </MDBBtn>
-            <div className="mt-3">
-              <span className="me-2">
-                Page {currentPage} of {totalPages}
-              </span>
-              <MDBBtn
-                color="info"
-                rounded
-                size="sm"
-                onClick={handleLoadLess}
-                disabled={currentPage === 1}
-              >
-                Prev
-              </MDBBtn>
-              <MDBBtn
-                color="info"
-                rounded
-                size="sm"
-                onClick={handleLoadMore}
-                disabled={currentPage === totalPages}
-                className="ms-2"
-              >
-                Next
-              </MDBBtn>
-            </div>
           </MDBTypography>
         </MDBCol>
       </MDBRow>
