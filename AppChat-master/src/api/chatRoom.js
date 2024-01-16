@@ -5,8 +5,13 @@ export class ChatAPI {
     const url = "api/v1/chatRoom/postChat";
     return axiosClient.post(url, data);
   }
-  static getAllMessage(data) {
-      const url = "api/v1/chatRoom/getAllChat";
-      return axiosClient.get(url, data);
+  static getRoomById(userId, receiverId) {
+    const url = `api/v1/room/${userId}/${receiverId}`;
+    return axiosClient.get(url)
+  }
+  static getMessagesByIdRoom(id) {
+    const url = `api/v1/chatRoom/${id}`;
+    return axiosClient.get(url)
   }
 }
+

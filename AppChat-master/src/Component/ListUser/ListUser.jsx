@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import styles from './ListUser.module.css'
 import { AuthAPI } from '../../api/auth';
 import { RoomAPI } from '../../api/room';
+import { ChatAPI } from '../../api/chatRoom';
+import { useNavigate } from 'react-router-dom';
 
 const ListUser = () => {
     const [dataUser, setDataUser] = useState([]);
+    const navigate = useNavigate(); 
 
     const handleGetAllUser = async () => {
         const response = await AuthAPI.getAllUser();
@@ -19,8 +22,9 @@ const ListUser = () => {
         try {
             const userLogin = localStorage.getItem('user')
             const userLoinId = JSON.parse(userLogin)
-            console.log(userLoinId);
             await RoomAPI.createRoom({ userId: userLoinId.id, receiverId: receiverId })
+            const roomId = await ChatAPI.getRoomById(userLoinId.id, receiverId)
+            navigate(`/ChatAll/${roomId.data.data.id}`);
         } catch (error) {
             console.log(error);
         }

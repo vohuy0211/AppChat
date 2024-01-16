@@ -4,7 +4,7 @@ import chatController from "../Controllers/chatRoom.controller.js";
 
 const chatRouter = express.Router();
 
-chatRouter.get("/getAllChat", chatController.handleGetAllChat);
 chatRouter.post("/postChat", chatController.handlePostChat);
+chatRouter.get("/:roomId" , chatController.handleGetMessagesById)
 
 export default chatRouter;

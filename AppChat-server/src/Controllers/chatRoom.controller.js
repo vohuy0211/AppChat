@@ -1,15 +1,16 @@
+import Message from "../Models/message.model.js";
 import chatModel from "../Models/message.model.js";
 import User from "../Models/user.model.js";
-import UserRoom from "../Models/userRoom.model.js";
 
 class chatController {
   async handlePostChat(req, res) {
     try {
-      const { text, userId } = req.body;
+      const { text, userId, roomId } = req.body;
 
       const newMessage = await chatModel.create({
         text,
         userId,
+        roomId,
       });
 
       req.app.get("io").emit("chatMessage", newMessage);
@@ -27,37 +28,41 @@ class chatController {
     }
   }
 
-  async handleGetAllChat(req, res) {
+  async handleGetMessagesById(req, res) {
     try {
-      const allMessages = await chatModel.findAll({
+      const { roomId } = req.params;
+
+      const page = req.query.page || 1;
+      const pageSize = 5;
+      const offset = (page - 1) * pageSize;
+
+      const { count, rows: messages } = await Message.findAndCountAll({
+        where: { roomId },
+        order: [["createdAt", "ASC"]],
         include: [
           {
             model: User,
-            attributes: ["username"],
+            attributes: ["id", "username"],
           },
         ],
-        order: [["createdAt", "ASC"]],
+        limit: pageSize,
+        offset,
       });
 
-      const localMessages = allMessages.map((message) => {
-        const localDate = new Date(
-          message.createdAt.getTime() -
-            message.createdAt.getTimezoneOffset() * 60000,
-        );
-        return {
-          ...message.toJSON(),
-          createdAt: localDate.toISOString(),
-        };
-      });
+      const totalPages = Math.ceil(count / pageSize);
 
       res.status(200).json({
-        message: "Lấy danh sách tin nhắn thành công",
-        data: localMessages,
+        message: "Lấy tin nhắn thành công",
+        data: {
+          messages,
+          currentPage: parseInt(page),
+          totalPages,
+        },
       });
     } catch (error) {
-      console.error("Lỗi khi lấy danh sách tin nhắn:", error);
+      console.error("Lỗi khi lấy tin nhắn theo roomId:", error);
       res.status(500).json({
-        message: "Có lỗi xảy ra khi lấy danh sách tin nhắn",
+        message: "Có lỗi xảy ra khi lấy tin nhắn",
         error: error.message,
       });
     }

@@ -14,56 +14,90 @@ import {
 } from "mdb-react-ui-kit";
 import Avatar from "react-avatar";
 
-// import { ChatAPI } from "../../api/chatRoom";
-// import { io } from "socket.io-client";
+import { ChatAPI } from "../../api/chatRoom";
+import { io } from "socket.io-client";
+import { useParams } from "react-router-dom";
+import moment from "moment";
 
 function ChatAll() {
-  // const socket = io(window.location.origin);
-  // const [ messages, setMessages] = useState([]);
-  // const [newMessage, setNewMessage] = useState("");
-  // const [dataMsg, setDataMsg] = useState([]);
+  const { id } = useParams();
+  const socket = io(window.location.origin);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [dataMsg, setDataMsg] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // const handleGetAllMsg = async () => {
-  //   try {
-  //     const response = await ChatAPI.getAllMessage();
-  //     setDataMsg(response.data.data)
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
+  const handleGetAllMsg = async (page) => {
+    try {
+      const response = await ChatAPI.getMessagesByIdRoom(id ,page);
+      setDataMsg(response.data.data.messages)
+      setMessages((prevMessages) => [...prevMessages, ...response.data.data.messages]);
+      setCurrentPage(response.data.data.currentPage);
+      setTotalPages(response.data.data.totalPages);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
-  // useEffect(() => {
-  //   handleGetAllMsg()
-  // }, [dataMsg])
+  useEffect(() => {
+    handleGetAllMsg(currentPage)
+  }, [dataMsg])
 
-  // const userId = JSON.parse(localStorage.getItem('user'));
+  const handleLoadMore = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
-  // const sendMessage = async () => {
-  //   try {
-  //     const response = await ChatAPI.sendMessage({
-  //       text: newMessage,
-  //       userId: userId.id,
-  //     });
+  const handleLoadLess = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
-  //     setMessages([...messages, response.data.data]);
-  //     setNewMessage("");
-  //   } catch (error) {
-  //     console.error("Error sending message:", error);
-  //   }
-  // };
+  const userId = JSON.parse(localStorage.getItem('user'));
 
-  // useEffect(() => {
-  //   socket.on("chatMessage", (message) => {
-  //     setMessages([...messages, message]);
-  //   });
-  //   return () => {
-  //     socket.off("chatMessage");
-  //   };
-  // }, [messages]);
+  const sendMessage = async (id) => {
+    try {
+      const response = await ChatAPI.sendMessage({
+        text: newMessage,
+        userId: userId.id,
+        roomId: id,
+      });
+
+      setMessages((prevMessages) => [...prevMessages, response.data.data]);
+      setNewMessage("");
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  useEffect(() => {
+    socket.on("chatMessage", (message) => {
+      setMessages([...messages, message]);
+    });
+    return () => {
+      socket.off("chatMessage");
+    };
+  }, [messages]);
+
+  const formatTime = (time) => {
+    const momentTime = moment(time);
+    if (momentTime.isValid()) {
+      return momentTime.format("HH:mm");
+    } else {
+      return moment(time, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm");
+    }
+  };
 
 
   return (
-    <MDBContainer fluid className={`py-5 ${styles.fullHeight}`} style={{ backgroundColor: "#eee" }}>
+    <MDBContainer
+      fluid
+      className={`py-5 ${styles.fullHeight}`}
+      style={{ backgroundColor: "#eee" }}
+    >
       <MDBRow>
         <MDBCol md="6" lg="5" xl="4" className="mb-4 mb-md-0">
           <h5 className="font-weight-bold mb-3 text-center text-lg-start">
@@ -72,65 +106,76 @@ function ChatAll() {
         </MDBCol>
         <MDBCol md="6" lg="7" xl="8">
           <MDBTypography listUnStyled>
-            <li className="d-flex justify-content-between mb-4">
-              <Avatar name="huy" className={styles.avt}/>
-              <MDBCard>
-                <MDBCardHeader className="d-flex justify-content-between p-3">
-                  <p className="fw-bold mb-0">Brad Pitt</p>
-                  <p className="text-muted small mb-0">
-                    <MDBIcon far icon="clock" /> 12 mins ago
-                  </p>
-                </MDBCardHeader>
-                <MDBCardBody>
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
-                  </p>
-                </MDBCardBody>
-              </MDBCard>
-            </li>
-            <li class="d-flex justify-content-between mb-4">
-              <MDBCard className="w-100">
-                <MDBCardHeader className="d-flex justify-content-between p-3">
-                  <p class="fw-bold mb-0">Lara Croft</p>
-                  <p class="text-muted small mb-0">
-                    <MDBIcon far icon="clock" /> 13 mins ago
-                  </p>
-                </MDBCardHeader>
-                <MDBCardBody>
-                  <p className="mb-0">
-                    Sed ut perspiciatis unde omnis iste natus error sit
-                    voluptatem accusantium doloremque laudantium.
-                  </p>
-                </MDBCardBody>
-              </MDBCard>
-              <Avatar name="huy" className={styles.avt}/>
-            </li>
-            <li className="d-flex justify-content-between mb-4">
-              <Avatar name="cười" className={styles.avt}/>
-              <MDBCard>
-                <MDBCardHeader className="d-flex justify-content-between p-3">
-                  <p className="fw-bold mb-0">Brad Pitt</p>
-                  <p className="text-muted small mb-0">
-                    <MDBIcon far icon="clock" /> 10 mins ago
-                  </p>
-                </MDBCardHeader>
-                <MDBCardBody>
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
-                  </p>
-                </MDBCardBody>
-              </MDBCard>
-            </li>
+            {Array.isArray(dataMsg) && dataMsg.map((message) => (
+              <li
+                key={message.id}
+                className={`d-flex justify-content-${message.userId === userId.id ? "end" : "start"
+                  } mb-4`}
+              >
+                {message.userId !== userId.id && (
+                  <Avatar
+                    name={message.User.username}
+                    className={styles.avt}
+                  />
+                )}
+                <MDBCard
+                  className={`w-75 ${message.userId === userId.id ? "bg-info text-white" : ""
+                    }`}
+                >
+                  <MDBCardHeader className="d-flex justify-content-between p-3">
+                    <p className="fw-bold mb-0">{message.User.username}</p>
+                    <p className="text-muted small mb-0">
+                      <MDBIcon far icon="clock" /> {formatTime(message.createdAt)}
+                    </p>
+                  </MDBCardHeader>
+                  <MDBCardBody>
+                    <p className="mb-0">{message.text}</p>
+                  </MDBCardBody>
+                </MDBCard>
+                {message.userId === userId.id && (
+                  <Avatar
+                    name={message.User.username}
+                    className={styles.avt}
+                  />
+                )}
+              </li>
+            ))}
             <li className="bg-white mb-3">
-              <MDBTextArea label="Message" id="textAreaExample" rows={4} />
+              <MDBTextArea
+                label="Message"
+                id="textAreaExample"
+                rows={4}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+              />
             </li>
-            <MDBBtn color="info" rounded className="float-end">
+            <MDBBtn color="info" rounded className="float-end" onClick={() => sendMessage(id)}>
               Send
             </MDBBtn>
+            <div className="mt-3">
+              <span className="me-2">
+                Page {currentPage} of {totalPages}
+              </span>
+              <MDBBtn
+                color="info"
+                rounded
+                size="sm"
+                onClick={handleLoadLess}
+                disabled={currentPage === 1}
+              >
+                Prev
+              </MDBBtn>
+              <MDBBtn
+                color="info"
+                rounded
+                size="sm"
+                onClick={handleLoadMore}
+                disabled={currentPage === totalPages}
+                className="ms-2"
+              >
+                Next
+              </MDBBtn>
+            </div>
           </MDBTypography>
         </MDBCol>
       </MDBRow>
