@@ -1,7 +1,54 @@
-.fullHeight {
+.wrapperLisChat {
+  border: 1px solid;
+  background-color: rgb(204, 195, 195);
   height: 100vh;
+  border: none;
 }
 
-.avt {
-  border-radius: 50px;
+.inputSend {
+  padding-left: 600px;
+  padding-top: 350px;
+  display: flex;
+  gap: 4px;
+}
+
+.inputSend input {
+  width: 1000px;
+  padding: 7px 20px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
+
+.inputSend button {
+  width: 70px;
+  border-radius: 10px;
+  border: none;
+  background-color: blueviolet;
+  color: white;
+}
+
+.inputSend button:hover {
+  background-color: rgb(72, 22, 119);
+}
+
+.navbarName {
+  padding-left: 1000px;
+  background-color: rgb(72, 22, 119);
+  border: none;
+  padding-top: 40px;
+  color: rgb(255, 255, 255);
+}
+
+.chat2 {
+  list-style: none;
+  margin-bottom: 10px;
+  padding-left: 650px;
+}
+
+.chat1 {
+  border: 1px solid;
+  list-style: none;
+  margin-bottom: 10px;
+  padding-left: 1400px;
 }

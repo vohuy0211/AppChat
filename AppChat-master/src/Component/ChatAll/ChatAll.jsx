@@ -1,19 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styles from "./ChatAll.module.css"
-import {
-  MDBContainer,
-  MDBRow,
-  MDBCol,
-  MDBCard,
-  MDBCardBody,
-  MDBIcon,
-  MDBBtn,
-  MDBTypography,
-  MDBTextArea,
-  MDBCardHeader,
-} from "mdb-react-ui-kit";
-import Avatar from "react-avatar";
-
 import { ChatAPI } from "../../api/chatRoom";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
@@ -21,11 +7,12 @@ import moment from "moment";
 
 function ChatAll() {
   const { id } = useParams();
-  const socket = io(window.location.origin);
+  const socket = io("ws://localhost:3000", {
+    transports: ['websocket']
+  });
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [dataMsg, setDataMsg] = useState([]);
- 
 
   const handleGetAllMsg = async () => {
     try {
@@ -38,7 +25,7 @@ function ChatAll() {
 
   useEffect(() => {
     handleGetAllMsg()
-  }, [dataMsg])
+  }, [id])
 
 
   const userId = JSON.parse(localStorage.getItem('user'));
@@ -60,12 +47,14 @@ function ChatAll() {
 
   useEffect(() => {
     socket.on("chatMessage", (message) => {
+      console.log("socket on ");
+      console.log("haha", message);
       setMessages([...messages, message]);
     });
     return () => {
       socket.off("chatMessage");
     };
-  }, [messages]);
+  }, []);
 
   const formatTime = (time) => {
     const momentTime = moment(time);
@@ -76,71 +65,27 @@ function ChatAll() {
     }
   };
 
-
   return (
-    <MDBContainer
-      fluid
-      className={`py-5 ${styles.fullHeight}`}
-      style={{ backgroundColor: "#eee" }}
-    >
-      <MDBRow>
-        <MDBCol md="6" lg="5" xl="4" className="mb-4 mb-md-0">
-          <h5 className="font-weight-bold mb-3 text-center text-lg-start">
-            Member
-          </h5>
-        </MDBCol>
-        <MDBCol md="6" lg="7" xl="8">
-          <MDBTypography listUnStyled>
-            {Array.isArray(dataMsg) && dataMsg.map((message) => (
-              <li
-                key={message.id}
-                className={`d-flex justify-content-${message.userId === userId.id ? "end" : "start"
-                  } mb-4`}
-              >
-                {message.userId !== userId.id && (
-                  <Avatar
-                    name={message.User.username} 
-                    className={styles.avt}
-                  />
-                )}
-                <MDBCard
-                  className={`w-75 ${message.userId === userId.id ? "bg-info text-white" : ""
-                    }`}
-                >
-                  <MDBCardHeader className="d-flex justify-content-between p-3">
-                    <p className="fw-bold mb-0">{message.User.username}</p>
-                    <p className="text-muted small mb-0">
-                      <MDBIcon far icon="clock" /> {formatTime(message.createdAt)}
-                    </p>
-                  </MDBCardHeader>
-                  <MDBCardBody>
-                    <p className="mb-0">{message.text}</p>
-                  </MDBCardBody>
-                </MDBCard>
-                {message.userId === userId.id && (
-                  <Avatar
-                    name={message.User.username} 
-                    className={styles.avt}
-                  />
-                )}
-              </li>
-            ))}
-            <li className="bg-white mb-3">
-              <MDBTextArea
-                label="Message"
-                id="textAreaExample"
-                rows={4}
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-              />
+    <div className={styles.wrapperLisChat}>
+      <div className={styles.navbarName}>
+        <h5>Tên người chat</h5>
+      </div>
+      <div className={styles.wrapperChat}>
+        {Array.isArray(dataMsg) &&
+          dataMsg.map((message) => (
+            <li key={message.id} className={styles.chat1}>
+              <h3>{message.User.username}</h3>
+              <p>{message.text}</p>
             </li>
-            <MDBBtn color="info" rounded className="float-end" onClick={() => sendMessage(id)}>
-              Send
-            </MDBBtn>
-          </MDBTypography>
-        </MDBCol>
-      </MDBRow>
-    </MDBContainer>
+          ))}
+        <div className={styles.inputSend}>
+          <input placeholder="Nhập tin nhắn"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)} />
+          <button onClick={() => sendMessage(id)}>Gửi</button>
+        </div>
+      </div>
+    </div>
   );
 }
 

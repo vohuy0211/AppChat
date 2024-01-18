@@ -8,15 +8,9 @@
     font-size: 17px;
 }
 
-.wrapperNavbarItem li:hover {
-    color: #f9c300;
-    cursor: pointer;
-    background-color: #2a4b6c; 
-}
-
 .wrapperNavbar {
-    background-color: #1367a2;
-    width: 550px;
+    background-color: rgb(149, 119, 177);
+    width: 400px;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -38,13 +32,15 @@
     cursor: pointer;
 }
 
-.wrapperNavbarItem li a {
+.wrapperNavbarItem li button {
     text-decoration: none;
     color: white;
     font-weight: bold;
+    border: none;
+    background-color:  rgb(149, 119, 177);
 }
 
-.wrapperNavbarItem li a:hover {
+.wrapperNavbarItem li :hover {
     color: #f9c300;
     text-decoration: underline; 
 }

@@ -7,25 +7,15 @@ import http from "http";
 import sequelize from "./src/libs/connect.mySQL.js"
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-    transports: ['websocket'],
-    allowEIO3: true,
-    cors: {
-        origin: "http://localhost:3000",
-        methods: ["GET", "POST"],
-    },
-    query: {
-        debug: 'socket.io:*',
-    },
-});
-
-const PORT = 3000;
-dotenv.config();
 
 app.use(cors());
 app.use(express.json());
 
+const server = http.createServer(app);
+const io = new Server().listen(server)
+
+const PORT = 3000;
+dotenv.config();
 Routes(app);
 
 app.set("io", io);
@@ -39,7 +29,7 @@ io.on("connection", (socket) => {
     });
 });
 
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
     console.log(`listening on port http://localhost:${PORT}`);
     try {
         await sequelize.authenticate();

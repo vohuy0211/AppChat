@@ -13,6 +13,8 @@ class chatController {
         roomId,
       });
 
+      console.log(req.app.get("io"))
+
       req.app.get("io").emit("chatMessage", newMessage);
 
       res.status(200).json({
