@@ -1,54 +1,55 @@
-.wrapperLisChat {
-  border: 1px solid;
-  background-color: rgb(204, 195, 195);
-  height: 100vh;
-  border: none;
-}
-
-.inputSend {
-  padding-left: 600px;
-  padding-top: 350px;
+/* .wrapperLisChat {
   display: flex;
-  gap: 4px;
-}
-
-.inputSend input {
-  width: 1000px;
-  padding: 7px 20px;
-  border-radius: 10px;
-  border: none;
-  outline: none;
-}
-
-.inputSend button {
-  width: 70px;
-  border-radius: 10px;
-  border: none;
-  background-color: blueviolet;
-  color: white;
-}
-
-.inputSend button:hover {
-  background-color: rgb(72, 22, 119);
+  flex-direction: column;
+  align-items: center;
+  background-color: rgb(91, 22, 94);
+  padding-left: 300px;
 }
 
 .navbarName {
-  padding-left: 1000px;
-  background-color: rgb(72, 22, 119);
-  border: none;
-  padding-top: 40px;
-  color: rgb(255, 255, 255);
+  margin-bottom: 20px;
 }
 
-.chat2 {
+.wrapperChat {
   list-style: none;
-  margin-bottom: 10px;
-  padding-left: 650px;
+  padding: 0;
+  margin: 0;
 }
 
 .chat1 {
-  border: 1px solid;
-  list-style: none;
+  background-color: #9900ff20;
   margin-bottom: 10px;
-  padding-left: 1400px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.inputSend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.inputSend input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  flex: 1;
+}
+
+.inputSend button {
+  background-color: #4f04ff;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.inputSend button:hover {
+  background-color: #3e03d6;
+} */
+.wrapperList {
+  background-color: rgb(201, 144, 201);
+  height: 90vh;
 }
