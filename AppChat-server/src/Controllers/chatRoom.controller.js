@@ -34,31 +34,31 @@ class chatController {
     try {
       const { roomId } = req.params;
 
-      const page = req.query.page || 1;
-      const pageSize = 5;
-      const offset = (page - 1) * pageSize;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 8;
 
       const { count, rows: messages } = await Message.findAndCountAll({
         where: { roomId },
-        order: [["createdAt", "ASC"]],
+        order: [["createdAt", "DESC"]],
         include: [
           {
             model: User,
             attributes: ["id", "username"],
           },
         ],
-        limit: pageSize,
-        offset,
+        limit,
+        offset: (page - 1) * limit,
       });
 
-      const totalPages = Math.ceil(count / pageSize);
+      const pageTotal = Math.ceil(count / limit);
 
       res.status(200).json({
         message: "Lấy tin nhắn thành công",
         data: {
           messages,
-          currentPage: parseInt(page),
-          totalPages,
+          currentPage: Math.min(page, pageTotal),
+          pageTotal,
+          limit,
         },
       });
     } catch (error) {

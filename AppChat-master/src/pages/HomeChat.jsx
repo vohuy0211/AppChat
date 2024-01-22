@@ -4,7 +4,7 @@ import styles from "./HomeChat.module.css"
 
 const HomeChatUser = ({ children }) => {
     return (
-        <div className={styles.wrapperContent}>
+        <div className={styles.wrapperChat}>
             <ListUser />
             {children}
         </div>

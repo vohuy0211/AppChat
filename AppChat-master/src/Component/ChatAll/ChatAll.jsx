@@ -1,17 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styles from "./ChatAll.module.css"
-import {
-  MDBContainer,
-  MDBRow,
-  MDBCol,
-  MDBCard,
-  MDBCardBody,
-  MDBIcon,
-  MDBBtn,
-  MDBTypography,
-  MDBTextArea,
-  MDBCardHeader,
-} from "mdb-react-ui-kit";
 import { ChatAPI } from "../../api/chatRoom";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
@@ -22,22 +10,35 @@ function ChatAll() {
   const socket = io("ws://localhost:3000", {
     transports: ['websocket']
   });
-  const [messages, setMessages] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [newMessage, setNewMessage] = useState("");
   const [dataMsg, setDataMsg] = useState([]);
 
-  const handleGetAllMsg = async () => {
+  const handleGetAllMsg = async (currentPage) => {
     try {
-      const response = await ChatAPI.getMessagesByIdRoom(id);
+      const response = await ChatAPI.getMessagesByIdRoom(id, currentPage);
+      setCurrentPage(response.data.data.currentPage);
       setDataMsg(response.data.data.messages)
+      setTotalPages(response.data.data.pageTotal);
+
+      // const { messages, pageTotal } = response.data.data;
+
+      // if (messages.length < 8 && currentPage > 1) {
+      //   setCurrentPage(currentPage - 1);
+      // } else {
+      //   setCurrentPage(response.data.data.currentPage);
+      //   setDataMsg(messages);
+      //   setTotalPages(pageTotal);
+      // }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    handleGetAllMsg()
-  }, [id])
+    handleGetAllMsg(currentPage)
+  }, [id, currentPage])
 
 
   const userId = JSON.parse(localStorage.getItem('user'));
@@ -50,7 +51,7 @@ function ChatAll() {
         roomId: id,
       });
 
-      setMessages([...messages, response.data.data]);
+      setDataMsg([...dataMsg, response.data.data]);
       setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -59,14 +60,12 @@ function ChatAll() {
 
   useEffect(() => {
     socket.on("chatMessage", (message) => {
-      console.log("socket on ");
-      console.log("haha", message);
-      setMessages([...messages, message]);
+      setDataMsg([...dataMsg, message]);
     });
     return () => {
       socket.off("chatMessage");
     };
-  }, []);
+  }, [dataMsg]);
 
   const formatTime = (time) => {
     const momentTime = moment(time);
@@ -77,120 +76,54 @@ function ChatAll() {
     }
   };
 
+  const handleLoadOlderMessages = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleLoadNewerMessages = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+
   return (
-    // <div className={styles.wrapperLisChat}>
-    //   <div className={styles.navbarName}>
-    //     <h5>Tên người chat</h5>
-    //   </div>
-    //   <div className={styles.wrapperChat}>
-    //     {Array.isArray(dataMsg) &&
-    //       dataMsg.map((message) => (
-    //         <li key={message.id} className={styles.chat1}>
-    //           <h3>{message.User.username}</h3>
-    //           <p>{message.text}</p>
-    //         </li>
-    //       ))}
-    //     <div className={styles.inputSend}>
-    //       <input placeholder="Nhập tin nhắn"
-    //         value={newMessage}
-    //         onChange={(e) => setNewMessage(e.target.value)} />
-    //       <button onClick={() => sendMessage(id)}>Gửi</button>
-    //     </div>
-    //   </div>
-    // </div>
-    <MDBContainer fluid className="py-5 gradient-custom">
-      <MDBRow className={styles.wrapperList}>
-        <MDBCol md="6" lg="5" xl="4" className="mb-4 mb-md-0">
-        </MDBCol>
-        <MDBCol md="6" lg="7" xl="8">
-          <MDBTypography listUnStyled className="text-white">
-            <li className="d-flex justify-content-between mb-4">
-              <img
-                src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp"
-                alt="avatar"
-                className="rounded-circle d-flex align-self-start me-3 shadow-1-strong"
-                width="60"
-              />
-              <MDBCard className="mask-custom">
-                <MDBCardHeader
-                  className="d-flex justify-content-between p-3"
-                  style={{ borderBottom: "1px solid rgba(255,255,255,.3)" }}
-                >
-                  <p className="fw-bold mb-0">Brad Pitt</p>
-                  <p className="text-light small mb-0">
-                    <MDBIcon far icon="clock" /> 12 mins ago
-                  </p>
-                </MDBCardHeader>
-                <MDBCardBody>
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
-                  </p>
-                </MDBCardBody>
-              </MDBCard>
-            </li>
-            <li class="d-flex justify-content-between mb-4">
-              <MDBCard className="w-100 mask-custom">
-                <MDBCardHeader
-                  className="d-flex justify-content-between p-3"
-                  style={{ borderBottom: "1px solid rgba(255,255,255,.3)" }}
-                >
-                  <p class="fw-bold mb-0">Lara Croft</p>
-                  <p class="text-light small mb-0">
-                    <MDBIcon far icon="clock" /> 13 mins ago
-                  </p>
-                </MDBCardHeader>
-                <MDBCardBody>
-                  <p className="mb-0">
-                    Sed ut perspiciatis unde omnis iste natus error sit
-                    voluptatem accusantium doloremque laudantium.
-                  </p>
-                </MDBCardBody>
-              </MDBCard>
-              <img
-                src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-5.webp"
-                alt="avatar"
-                className="rounded-circle d-flex align-self-start ms-3 shadow-1-strong"
-                width="60"
-              />
-            </li>
-            <li className="d-flex justify-content-between mb-4">
-              <img
-                src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp"
-                alt="avatar"
-                className="rounded-circle d-flex align-self-start me-3 shadow-1-strong"
-                width="60"
-              />
-              <MDBCard className="mask-custom">
-                <MDBCardHeader
-                  className="d-flex justify-content-between p-3"
-                  style={{ borderBottom: "1px solid rgba(255,255,255,.3)" }}
-                >
-                  <p className="fw-bold mb-0">Brad Pitt</p>
-                  <p className="text-light small mb-0">
-                    <MDBIcon far icon="clock" /> 10 mins ago
-                  </p>
-                </MDBCardHeader>
-                <MDBCardBody>
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
-                  </p>
-                </MDBCardBody>
-              </MDBCard>
-            </li>
-            <li className="mb-3">
-              <MDBTextArea label="Message" id="textAreaExample" rows={4} />
-            </li>
-            <MDBBtn color="light" size="lg" rounded className="float-end haha">
-              Send
-            </MDBBtn>
-          </MDBTypography>
-        </MDBCol>
-      </MDBRow>
-    </MDBContainer>
+    <div className={styles.wrapperListChat}>
+      <div className={styles.ChatUser}>
+        TÊN NGƯỜI NHẬN TIN NHẮN
+      </div>
+      <hr></hr>
+      <div className={styles.chatContent}>
+        <div>
+          <button onClick={handleLoadNewerMessages} disabled={currentPage === totalPages}>
+            Xem tin nhắn cũ
+          </button>
+        </div>
+        {dataMsg.slice().reverse().map((msg, index) => (
+          <div key={index} className={msg.userId === userId.id ? styles.messageReceiver : styles.messageSender}>
+            {msg.User && msg.User.username} : {msg.text}
+            <h6>{formatTime(msg.createdAt)}</h6>
+          </div>
+        ))}
+      </div>
+      <div>
+        <button onClick={handleLoadOlderMessages} disabled={currentPage === 1}>
+          Xem tin nhắn mới
+        </button>
+      </div>
+      <hr></hr>
+      <div className={styles.sendMessages}>
+        <input placeholder='Send Messages'
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+        />
+        <button onClick={() => sendMessage(id)}>
+          Send
+        </button>
+      </div>
+    </div>
   );
 }
 

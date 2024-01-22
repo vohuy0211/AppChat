@@ -9,8 +9,8 @@ export class ChatAPI {
     const url = `api/v1/room/${userId}/${receiverId}`;
     return axiosClient.get(url)
   }
-  static getMessagesByIdRoom(id) {
-    const url = `api/v1/chatRoom/${id}`;
+  static getMessagesByIdRoom(id, page = 1) {
+    const url = `api/v1/chatRoom/${id}?page=${page}`;
     return axiosClient.get(url)
   }
 }
