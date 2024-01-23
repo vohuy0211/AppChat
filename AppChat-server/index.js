@@ -21,7 +21,13 @@ Routes(app);
 app.set("io", io);
 
 io.on("connection", (socket) => {
-    console.log("Người dùng đã kết nối:", socket);
+    console.log("Người dùng đã kết nối:", socket.id);
+
+    socket.on("disconnect", (roomId) => {
+        socket.join(roomId);
+        console.log("Người dùng đã ngắt kết nối:", socket.id);
+    });
+
     io.emit("message", "Chào mừng đến với ứng dụng chat!");
 
     socket.on("disconnect", () => {

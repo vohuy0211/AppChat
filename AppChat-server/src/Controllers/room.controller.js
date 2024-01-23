@@ -54,6 +54,27 @@ class roomController {
             console.log(error);
         }
     }
+
+    //     async handleUpdateUnreadMessages(req, res) {
+    //   try {
+    //     const { roomId } = req.params;
+
+    //     const room = await Room.findByPk(roomId);
+
+    //     if (!room) {
+    //       return res.status(404).json({ msg: 'Không tìm thấy phòng' });
+    //     }
+
+    //     // Đặt `unreadMessages` về 0 khi có người đọc tin nhắn
+    //     room.unreadMessages = 0;
+    //     await room.save();
+
+    //     res.status(200).json({ msg: 'Cập nhật số lượng tin nhắn chưa đọc thành công', data: room });
+    //   } catch (error) {
+    //     res.status(500).json({ msg: 'Lỗi' });
+    //     console.log(error);
+    //   }
+    // }
 }
 
 export default new roomController();

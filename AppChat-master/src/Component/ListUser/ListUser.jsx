@@ -51,7 +51,8 @@ const ListUser = () => {
                             onClick={() => handleCreateRoom(user.id)}
                             className={interactingUser === user.id ? styles.boldText : ''}
                         >
-                            {user.username} <span>1</span>
+                            {user.username}
+                            {/* <span>1</span> */}
                         </li>
                     </ul>
                 )))}

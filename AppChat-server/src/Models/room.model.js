@@ -15,7 +15,16 @@ const Room = sequelize.define("Room", {
     receiverId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-    }
+    },
+    unreadMessages: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+    },
+    lastMessage: {
+        type: DataTypes.STRING, 
+        allowNull: true,
+    },
 }, {
     uniqueKeys: {
         uniqueRoom: {

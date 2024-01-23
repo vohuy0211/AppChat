@@ -4,6 +4,8 @@ import { ChatAPI } from "../../api/chatRoom";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
 import moment from "moment";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function ChatAll() {
   const { id } = useParams();
@@ -14,6 +16,7 @@ function ChatAll() {
   const [totalPages, setTotalPages] = useState(1);
   const [newMessage, setNewMessage] = useState("");
   const [dataMsg, setDataMsg] = useState([]);
+  const [newMessageFromOthers, setNewMessageFromOthers] = useState(false);
 
   const handleGetAllMsg = async (currentPage) => {
     try {
@@ -21,16 +24,6 @@ function ChatAll() {
       setCurrentPage(response.data.data.currentPage);
       setDataMsg(response.data.data.messages)
       setTotalPages(response.data.data.pageTotal);
-
-      // const { messages, pageTotal } = response.data.data;
-
-      // if (messages.length < 8 && currentPage > 1) {
-      //   setCurrentPage(currentPage - 1);
-      // } else {
-      //   setCurrentPage(response.data.data.currentPage);
-      //   setDataMsg(messages);
-      //   setTotalPages(pageTotal);
-      // }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -58,14 +51,24 @@ function ChatAll() {
     }
   };
 
+  const joinRoom = () => {
+    socket.emit("joinRoom", id);
+  };
+
   useEffect(() => {
+    joinRoom(); 
     socket.on("chatMessage", (message) => {
-      setDataMsg([...dataMsg, message]);
+      if (message.userId !== userId.id) {
+        setNewMessageFromOthers(true);
+        toast.info(`Bạn có một tin nhắn mới!`);
+      }
+      setDataMsg(prevData => [...prevData, message]);
     });
+
     return () => {
       socket.off("chatMessage");
     };
-  }, [dataMsg]);
+  }, [userId.id, socket]);
 
   const formatTime = (time) => {
     const momentTime = moment(time);
@@ -88,30 +91,31 @@ function ChatAll() {
     }
   };
 
+  const handleWheelScroll = (e) => {
+    if (e.deltaY < 0 && currentPage > 1) {
+      handleLoadOlderMessages();
+    } else if (e.deltaY > 0 && currentPage < totalPages) {
+      handleLoadNewerMessages();
+    }
+  };
 
   return (
     <div className={styles.wrapperListChat}>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false} />
       <div className={styles.ChatUser}>
         TÊN NGƯỜI NHẬN TIN NHẮN
       </div>
       <hr></hr>
-      <div className={styles.chatContent}>
-        <div>
-          <button onClick={handleLoadNewerMessages} disabled={currentPage === totalPages}>
-            Xem tin nhắn cũ
-          </button>
-        </div>
-        {dataMsg.slice().reverse().map((msg, index) => (
+      <div className={styles.chatContent} onWheel={handleWheelScroll}>
+        {dataMsg.map((msg, index) => (
           <div key={index} className={msg.userId === userId.id ? styles.messageReceiver : styles.messageSender}>
             {msg.User && msg.User.username} : {msg.text}
             <h6>{formatTime(msg.createdAt)}</h6>
           </div>
         ))}
-      </div>
-      <div>
-        <button onClick={handleLoadOlderMessages} disabled={currentPage === 1}>
-          Xem tin nhắn mới
-        </button>
       </div>
       <hr></hr>
       <div className={styles.sendMessages}>

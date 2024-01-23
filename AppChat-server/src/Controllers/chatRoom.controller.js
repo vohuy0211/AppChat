@@ -13,8 +13,6 @@ class chatController {
         roomId,
       });
 
-      console.log(req.app.get("io"))
-
       req.app.get("io").emit("chatMessage", newMessage);
 
       res.status(200).json({
@@ -37,25 +35,41 @@ class chatController {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 8;
 
-      const { count, rows: messages } = await Message.findAndCountAll({
+      const { count, rows: allMessages } = await Message.findAndCountAll({
         where: { roomId },
-        order: [["createdAt", "DESC"]],
+        order: [["createdAt", "ASC"]],
         include: [
           {
             model: User,
             attributes: ["id", "username"],
           },
         ],
-        limit,
-        offset: (page - 1) * limit,
       });
 
       const pageTotal = Math.ceil(count / limit);
 
+      let paginatedMessages;
+
+      if (page > pageTotal) {
+        paginatedMessages = [];
+      } else {
+        const offset = (page - 1) * limit;
+        paginatedMessages = allMessages.slice(offset, offset + limit);
+
+        if (paginatedMessages.length < limit) {
+          const remainingLimit = limit - paginatedMessages.length;
+
+          const offsetPreviousPage = offset - limit;
+          const olderMessages = allMessages.slice(offsetPreviousPage, offsetPreviousPage + remainingLimit).reverse();
+
+          paginatedMessages = [...olderMessages.reverse(), ...paginatedMessages];
+        }
+      }
+
       res.status(200).json({
         message: "Lấy tin nhắn thành công",
         data: {
-          messages,
+          messages: paginatedMessages,
           currentPage: Math.min(page, pageTotal),
           pageTotal,
           limit,
