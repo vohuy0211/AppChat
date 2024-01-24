@@ -41,8 +41,13 @@ function ChatAll() {
       const response = await ChatAPI.sendMessage({
         text: newMessage,
         userId: userId.id,
-        roomId: id,
+        roomId: parseInt(id),
       });
+
+      await ChatAPI.createUserRoom({
+        UserId: userId.id,
+        RoomId: parseInt(id),
+      })
 
       setDataMsg([...dataMsg, response.data.data]);
       setNewMessage("");
@@ -56,13 +61,14 @@ function ChatAll() {
   };
 
   useEffect(() => {
-    joinRoom(); 
+    joinRoom();
     socket.on("chatMessage", (message) => {
       if (message.userId !== userId.id) {
         setNewMessageFromOthers(true);
         toast.info(`Bạn có một tin nhắn mới!`);
       }
       setDataMsg(prevData => [...prevData, message]);
+      setNewMessage("");
     });
 
     return () => {

@@ -2,6 +2,7 @@ import userModel from "../Models/user.model.js";
 import bcrypt from "bcrypt";
 import sceretKey from "../config/jwt.config.js";
 import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
 
 class userController {
   async handleRegister(req, res) {
@@ -50,7 +51,9 @@ class userController {
 
   async handleGetAllUser(req, res) {
     try {
-      const allUsers = await userModel.findAll();
+      const allUsers = await userModel.findAll({
+
+      });
       res.status(200).json({ data: allUsers });
     } catch (error) {
       res.status(500).json({ msg: "Internal Server Error" });
@@ -71,6 +74,23 @@ class userController {
     } catch (error) {
       res.status(500).json({ msg: "Lỗi" });
       console.log(error);
+    }
+  }
+
+  async handleSearch(req, res) {
+    const searchTerm = req.params.searchTerm;
+    try {
+      const userAll = await userModel.findAll({
+        where: {
+          username: {
+            [Op.like]: `%${searchTerm}%`,
+          },
+        },
+      });
+      res.status(200).json({ data: userAll });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ msg: 'Server loi' });
     }
   }
 }

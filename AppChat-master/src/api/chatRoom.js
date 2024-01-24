@@ -13,5 +13,9 @@ export class ChatAPI {
     const url = `api/v1/chatRoom/${id}?page=${page}`;
     return axiosClient.get(url)
   }
+  static createUserRoom(data) {
+    const url = "api/v1/userRoom/createUserRoom";
+    return axiosClient.post(url,data)
+  }
 }
 

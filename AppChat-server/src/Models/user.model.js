@@ -1,5 +1,6 @@
 import sequelize from "../libs/connect.mySQL.js";
 import { DataTypes } from "sequelize";
+import Room from "./room.model.js";
 
 const User = sequelize.define(
   "User",

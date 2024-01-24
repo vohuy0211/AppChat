@@ -1,5 +1,6 @@
 import Message from "../Models/message.model.js";
 import chatModel from "../Models/message.model.js";
+import Room from "../Models/room.model.js";
 import User from "../Models/user.model.js";
 
 class chatController {
@@ -14,6 +15,13 @@ class chatController {
       });
 
       req.app.get("io").emit("chatMessage", newMessage);
+
+      const room = await Room.findOne({ where: roomId });
+
+      if (room) {
+        room.lastMessage = new Date();
+        await room.save();
+      }
 
       res.status(200).json({
         message: "Tin nhắn đã gửi thành công",

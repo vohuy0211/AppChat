@@ -4,6 +4,7 @@ import { AuthAPI } from '../../api/auth';
 import { RoomAPI } from '../../api/room';
 import { ChatAPI } from '../../api/chatRoom';
 import { Link, useNavigate } from 'react-router-dom';
+import { IoCreateOutline } from "react-icons/io5";
 
 const ListUser = () => {
     const [dataUser, setDataUser] = useState([]);
@@ -35,8 +36,9 @@ const ListUser = () => {
 
     return (
         <div className={styles.wrapperListUser}>
-            <div>
+            <div className={styles.create}>
                 <input placeholder='Tìm kiếm người dùng' />
+                <IoCreateOutline className={styles.item}/>
             </div>
             <hr></hr>
             <div className={styles.ChatUser}>

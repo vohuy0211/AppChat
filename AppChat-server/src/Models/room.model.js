@@ -22,7 +22,7 @@ const Room = sequelize.define("Room", {
         allowNull: false,
     },
     lastMessage: {
-        type: DataTypes.STRING, 
+        type: DataTypes.DATE,
         allowNull: true,
     },
 }, {
@@ -30,7 +30,8 @@ const Room = sequelize.define("Room", {
         uniqueRoom: {
             fields: ['userId', 'receiverId']
         }
-    }
+    },
+    timestamps: true,
 });
 
 Room.sync().then(() => {
