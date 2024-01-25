@@ -34,9 +34,4 @@ const Room = sequelize.define("Room", {
     timestamps: true,
 });
 
-Room.sync().then(() => {
-    console.log("tạo bảng ROOM thành công");
-});
-
-
 export default Room;

@@ -30,7 +30,7 @@
 }
 
 .logout {
-    margin-top: 515px;
+    margin-top: 500px;
     text-align: center;
 }
 
@@ -57,3 +57,60 @@ ul li span {
     font-size: 30px;
     cursor: pointer;
 }
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 400px;
+    max-width: 80%;
+}
+
+.modal-enter {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.modal-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.modal-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.modal-exit-active {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 300ms, transform 300ms;
+}
+
+.modal h3 {
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: space-around
+}
+
+.iconAdd {
+    cursor: pointer;
+}
+
+.modal button {
+    border: none;
+    border-radius: 5px;
+    background-color: aquamarine;
+}
+

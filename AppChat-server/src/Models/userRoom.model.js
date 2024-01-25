@@ -1,7 +1,5 @@
 import sequelize from "../libs/connect.mySQL.js";
 import { DataTypes } from "sequelize";
-import Room from "./room.model.js";
-import User from "./user.model.js";
 
 const UserRoom = sequelize.define("UserRoom", {
     id: {
@@ -9,14 +7,7 @@ const UserRoom = sequelize.define("UserRoom", {
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
-    }
-});
-
-Room.belongsToMany(User, { through: UserRoom });
-User.belongsToMany(Room, { through: UserRoom });
-
-UserRoom.sync().then(() => {
-    console.log("Tạo bảng trung gian thành công");
+    },
 });
 
 export default UserRoom;

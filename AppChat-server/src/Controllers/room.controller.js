@@ -1,5 +1,5 @@
-import Room from "../Models/room.model.js";
 import { Op } from "sequelize";
+import Room from "../Models/index.js";
 
 class roomController {
     async handleCreateRoom(req, res) {

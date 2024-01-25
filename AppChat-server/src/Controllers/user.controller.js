@@ -1,34 +1,37 @@
-import userModel from "../Models/user.model.js";
 import bcrypt from "bcrypt";
 import sceretKey from "../config/jwt.config.js";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
+import User from "../Models/index.js";
 
 class userController {
   async handleRegister(req, res) {
     const { email, password } = req.body;
-    // console.log(req.body);
+    console.log(req.body);
     try {
-      const userData = await userModel.findOne({ where: { email } });
+      const userData = await User.findOne({ where: { email } });
       if (userData) {
         return res.status(400).json({ msg: "email đã tồn tại" });
       }
       const saltRounds = 10;
       const salt = await bcrypt.genSalt(saltRounds);
       const hashedPassword = await bcrypt.hash(password, salt);
-      const user = await userModel.create({
+      const user = await User.create({
         ...req.body,
         password: hashedPassword,
       });
 
       res.status(200).json({ msg: "Register Successfully", user });
-    } catch (error) { }
+    } catch (error) {
+      res.status(500).json({ msg: error });
+      console.log(error);
+    }
   }
 
   async handleLogin(req, res) {
     const { email, password } = req.body;
     try {
-      const userData = await userModel.findOne({ where: { email } });
+      const userData = await User.findOne({ where: { email } });
       console.log(userData);
       if (userData) {
         const myPass = await bcrypt.compare(password, userData.password);
@@ -51,7 +54,7 @@ class userController {
 
   async handleGetAllUser(req, res) {
     try {
-      const allUsers = await userModel.findAll({
+      const allUsers = await User.findAll({
 
       });
       res.status(200).json({ data: allUsers });
@@ -64,7 +67,7 @@ class userController {
     try {
       const userId = req.params.id;
 
-      const user = await userModel.findByPk(userId);
+      const user = await User.findByPk(userId);
 
       if (!user) {
         return res.status(404).json({ msg: "Không tìm thấy người dùng với id đã cho" });
@@ -80,7 +83,7 @@ class userController {
   async handleSearch(req, res) {
     const searchTerm = req.params.searchTerm;
     try {
-      const userAll = await userModel.findAll({
+      const userAll = await User.findAll({
         where: {
           username: {
             [Op.like]: `%${searchTerm}%`,

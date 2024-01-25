@@ -1,27 +1,48 @@
-import UserRoom from "../Models/userRoom.model.js";
+import Room from "../Models/room.model.js";
+import User from "../Models/user.model.js";
+import UserRoom from "../Models/index.js";
 
 class userRoomController {
     async handleCreate(req, res) {
         try {
-            const { UserId, RoomId } = req.body;
+            const { userId, roomId } = req.body;
+
+            if (!userId || !roomId) {
+                return res.status(400).json({ msg: "Thiếu thông tin userId hoặc roomId" });
+            }
 
             const newUserRoom = await UserRoom.create({
-                UserId,
-                RoomId,
+                userId,
+                roomId,
             })
 
             res.status(201).json({ msg: "Phòng đã được tạo thành công", data: newUserRoom });
         } catch (error) {
-            res.status(500).json({ msg: "Lỗi" });
+            res.status(500).json({ msg: error });
+            console.log(error);
         }
     }
 
     async handleGetUserRoom(req, res) {
         try {
-            const userRoom = await UserRoom.findAll();
-            res.status(200).json({ data: userRoom });
+            const userRooms = await UserRoom.findAll({
+                include: [
+                    {
+                        model: Room,
+                        attributes: ['lastMessage'],
+                    },
+                    {
+                        model: User,
+                        attributes: ['username'],
+                    },
+                ],
+                order: [[Room, 'lastMessage', 'DESC']],
+            });
+
+            res.status(200).json({ data: userRooms });
         } catch (error) {
-            res.status(500).json({ msg: "Internal Server Error" });
+            console.error(error);
+            res.status(500).json({ msg: error.message });
         }
     }
 }

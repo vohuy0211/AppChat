@@ -1,7 +1,5 @@
 import sequelize from "../libs/connect.mySQL.js";
 import { DataTypes } from "sequelize";
-import User from "./user.model.js";
-import Room from "./room.model.js";
 
 const Message = sequelize.define(
   "Message",
@@ -21,15 +19,5 @@ const Message = sequelize.define(
     timestamps: true,
   },
 );
-
-Message.belongsTo(User, { foreignKey: "userId" });
-User.hasMany(Message, { foreignKey: "userId" });
-
-Message.belongsTo(Room, { foreignKey: "roomId" });
-Room.hasMany(Message, { foreignKey: "roomId" });
-
-Message.sync().then(() => {
-  console.log("tạo bảng messages thành công");
-});
 
 export default Message;
