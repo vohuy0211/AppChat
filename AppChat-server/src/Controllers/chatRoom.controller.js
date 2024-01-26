@@ -1,14 +1,13 @@
-import Message from "../Models/message.model.js";
-import chatModel from "../Models/message.model.js";
-import Room from "../Models/room.model.js";
-import User from "../Models/user.model.js";
+import models from "../Models/index.js";
+
+const { User, Room, UserRoom, Message } = models;
 
 class chatController {
   async handlePostChat(req, res) {
     try {
       const { text, userId, roomId } = req.body;
 
-      const newMessage = await chatModel.create({
+      const newMessage = await Message.create({
         text,
         userId,
         roomId,

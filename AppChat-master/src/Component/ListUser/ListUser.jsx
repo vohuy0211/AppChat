@@ -8,12 +8,17 @@ import { IoCreateOutline } from "react-icons/io5";
 import { CiCirclePlus } from "react-icons/ci";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { io } from 'socket.io-client';
 
 const ListUser = () => {
     const [dataUser, setDataUser] = useState([]);
     const navigate = useNavigate();
     const [interactingUser, setInteractingUser] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [userRoom, setUserRoom] = useState([]);
+    const socket = io("ws://localhost:3000", {
+        transports: ['websocket']
+    });
 
     const userLogin = localStorage.getItem('user')
     const userLoinId = JSON.parse(userLogin)
@@ -22,23 +27,57 @@ const ListUser = () => {
         const response = await AuthAPI.getAllUser();
         setDataUser(response.data.data)
     }
+    
+    const handleGetUserRoom = async (id) => {
+        {
+            const response = await RoomAPI.getAllUserRoom();
+            setUserRoom(response.data.data);
+            console.log(response);
+        }
+    }
 
     useEffect(() => {
         handleGetAllUser()
     }, [])
 
+    useEffect(() => {
+        socket.on("chatMessage", async (message) => {
+            try {
+                if (message) {
+                    handleGetUserRoom()
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        });
+
+        return () => {
+            socket.off("chatMessage");
+        };
+    }, [socket]);
+
+
+    const handleNavigateRoom = async (receiverId) => {
+        try {
+            const roomId = await ChatAPI.getRoomById(userLoinId.id, receiverId)
+            navigate(`/ChatAll/${roomId.data.data.id}`);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     const handleCreateRoom = async (receiverId) => {
         try {
             await RoomAPI.createRoom({ userId: userLoinId.id, receiverId: receiverId })
             const roomId = await ChatAPI.getRoomById(userLoinId.id, receiverId)
-            console.log(roomId.data.data.id);
-            console.log(receiverId);
+
             await RoomAPI.createUserRoom({ userId: receiverId, roomId: roomId.data.data.id })
-            // navigate(`/ChatAll/${roomId.data.data.id}`);
-            setInteractingUser(receiverId);
+            await handleGetUserRoom();
+
             setIsModalVisible(!isModalVisible);
         } catch (error) {
             console.log(error);
+            setIsModalVisible(!isModalVisible);
         }
     };
 
@@ -86,12 +125,14 @@ const ListUser = () => {
             </div>
             <hr></hr>
             <ul >
-                <li
-                // onClick={() => handleCreateRoom(user.id)}
-                >
-                    tên trong cuộc trò chuyện
-                    {/* <span>1</span> */}
-                </li>
+                {userRoom.filter((user) => user.id !== userLoinId.id)
+                    .map((user) => (
+                        <li key={user.id}
+                            onClick={() => handleNavigateRoom(user.userId)}
+                        >
+                            <h3>{user.User.username}</h3>
+                        </li>
+                    ))}
             </ul>
             <div className={styles.logout}>
                 <hr></hr>

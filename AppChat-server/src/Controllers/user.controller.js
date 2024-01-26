@@ -2,7 +2,9 @@ import bcrypt from "bcrypt";
 import sceretKey from "../config/jwt.config.js";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
-import User from "../Models/index.js";
+import models from "../Models/index.js";
+
+const { User, Room, UserRoom, Message } = models;
 
 class userController {
   async handleRegister(req, res) {

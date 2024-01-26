@@ -1,6 +1,6 @@
-import Room from "../Models/room.model.js";
-import User from "../Models/user.model.js";
-import UserRoom from "../Models/index.js";
+import models from "../Models/index.js";
+
+const { User, Room, UserRoom, Message } = models;
 
 class userRoomController {
     async handleCreate(req, res) {
@@ -9,6 +9,17 @@ class userRoomController {
 
             if (!userId || !roomId) {
                 return res.status(400).json({ msg: "Thiếu thông tin userId hoặc roomId" });
+            }
+
+            const existingUserRoom = await UserRoom.findOne({
+                where: {
+                    userId,
+                    roomId,
+                },
+            });
+
+            if (existingUserRoom) {
+                return res.status(404).json({ msg: "Người dùng đã có trong cuộc trò chuyện" });
             }
 
             const newUserRoom = await UserRoom.create({
@@ -25,21 +36,35 @@ class userRoomController {
 
     async handleGetUserRoom(req, res) {
         try {
+            const { id } = req.params;
+
             const userRooms = await UserRoom.findAll({
+                where: {
+                    userId: id
+                }
+            });
+
+            const roomIds = userRooms.map(userRoom => userRoom.roomId);
+
+            const rooms = await Room.findAll({
+                where: {
+                    id: roomIds
+                },
                 include: [
-                    {
-                        model: Room,
-                        attributes: ['lastMessage'],
-                    },
                     {
                         model: User,
                         attributes: ['username'],
                     },
-                ],
-                order: [[Room, 'lastMessage', 'DESC']],
+                    {
+                        model: Message,
+                        attributes: ['content', 'createdAt'],
+                        limit: 1,
+                        order: [['createdAt', 'DESC']]
+                    }
+                ]
             });
 
-            res.status(200).json({ data: userRooms });
+            res.status(200).json({ data: rooms });
         } catch (error) {
             console.error(error);
             res.status(500).json({ msg: error.message });

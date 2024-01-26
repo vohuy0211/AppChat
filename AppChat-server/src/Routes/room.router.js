@@ -3,8 +3,8 @@ import roomController from "../Controllers/room.controller.js";
 
 const roomRouter = express.Router();
 
-roomRouter.post("/creatRoom" , roomController.handleCreateRoom);
-roomRouter.get("/:userId/:receiverId" , roomController.handleGetRoomById);
-// roomRouter.put('/updateDateUser/:roomId' , roomController.updateDateList)
+roomRouter.post("/creatRoom", roomController.handleCreateRoom);
+roomRouter.get("/:userId/:receiverId", roomController.handleGetRoomById);
+roomRouter.put("/updateDateUser/:roomId", roomController.updateDateListMessages)
 
 export default roomRouter;
