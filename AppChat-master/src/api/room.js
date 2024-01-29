@@ -9,8 +9,8 @@ export class RoomAPI {
     const url = "api/v1/userRoom/createUserRoom";
     return axiosClient.post(url, userId, roomId);
   }
-  static getAllUserRoom(data) {
-    const url = "api/v1/userRoom/getAllUserRoom";
-    return axiosClient.get(url , data)
+  static getAllUserRoom(id) {
+    const url = `api/v1/userRoom/getAllUserRoom/${id}`;
+    return axiosClient.get(url)
   }
 }

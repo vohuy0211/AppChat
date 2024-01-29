@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import models from "../Models/index.js";
 
 const { User, Room, UserRoom, Message } = models;
@@ -37,34 +38,26 @@ class userRoomController {
     async handleGetUserRoom(req, res) {
         try {
             const { id } = req.params;
-
-            const userRooms = await UserRoom.findAll({
-                where: {
-                    userId: id
-                }
-            });
-
-            const roomIds = userRooms.map(userRoom => userRoom.roomId);
-
+    
+            // Fetch all rooms associated with the user, either as sender or receiver
             const rooms = await Room.findAll({
                 where: {
-                    id: roomIds
+                    [Op.or]: [
+                        { userId: id },
+                        { receiverId: id }
+                    ]
                 },
-                include: [
-                    {
-                        model: User,
-                        attributes: ['username'],
-                    },
-                    {
-                        model: Message,
-                        attributes: ['content', 'createdAt'],
-                        limit: 1,
-                        order: [['createdAt', 'DESC']]
-                    }
-                ]
+                include: [{
+                    model: User,
+                    attributes: ['id', 'username']
+                }],
+                order: [['lastMessage', 'DESC']]
             });
-
-            res.status(200).json({ data: rooms });
+    
+            // You can format the data here as needed
+            // For instance, you might want to merge room information with userRoom details
+    
+            res.status(200).json({ msg: "User rooms list", data: rooms });
         } catch (error) {
             console.error(error);
             res.status(500).json({ msg: error.message });

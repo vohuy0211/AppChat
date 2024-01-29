@@ -13,7 +13,6 @@ import { io } from 'socket.io-client';
 const ListUser = () => {
     const [dataUser, setDataUser] = useState([]);
     const navigate = useNavigate();
-    const [interactingUser, setInteractingUser] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [userRoom, setUserRoom] = useState([]);
     const socket = io("ws://localhost:3000", {
@@ -27,17 +26,15 @@ const ListUser = () => {
         const response = await AuthAPI.getAllUser();
         setDataUser(response.data.data)
     }
-    
-    const handleGetUserRoom = async (id) => {
-        {
-            const response = await RoomAPI.getAllUserRoom();
-            setUserRoom(response.data.data);
-            console.log(response);
-        }
+
+    const handleGetUserRoom = async () => {
+        const response = await RoomAPI.getAllUserRoom(userLoinId.id);
+        setUserRoom(response.data.data);
     }
 
     useEffect(() => {
         handleGetAllUser()
+        handleGetUserRoom()
     }, [])
 
     useEffect(() => {
@@ -85,6 +82,8 @@ const ListUser = () => {
         setIsModalVisible(!isModalVisible);
     };
 
+    console.log(userRoom);
+
     return (
         <div className={styles.wrapperListUser}>
             <ToastContainer
@@ -124,15 +123,15 @@ const ListUser = () => {
                 <h3>Welcome {userLoinId.username}</h3>
             </div>
             <hr></hr>
-            <ul >
-                {userRoom.filter((user) => user.id !== userLoinId.id)
-                    .map((user) => (
-                        <li key={user.id}
-                            onClick={() => handleNavigateRoom(user.userId)}
-                        >
-                            <h3>{user.User.username}</h3>
+            <ul>
+                {userRoom.map((room) => {
+                    const otherUser = room.Room.Users.find(u => u.id !== userLoinId.id);
+                    return (
+                        <li key={room.id} onClick={() => handleNavigateRoom(otherUser.id)}>
+                            <h3>{otherUser.username}</h3>
                         </li>
-                    ))}
+                    );
+                })}
             </ul>
             <div className={styles.logout}>
                 <hr></hr>
