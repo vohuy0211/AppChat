@@ -4,6 +4,6 @@ import userRoomController from "../Controllers/userRoom.controller.js";
 const userRoomRouter = express.Router();
 
 userRoomRouter.post("/createUserRoom", userRoomController.handleCreate);
-userRoomRouter.get("/getAllUserRoom/:id", userRoomController.handleGetUserRoom);
+userRoomRouter.get("/getUserRoomById/:id", userRoomController.handleGetUserRoom);
 
 export default userRoomRouter;

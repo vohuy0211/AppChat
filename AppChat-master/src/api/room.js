@@ -10,7 +10,7 @@ export class RoomAPI {
     return axiosClient.post(url, userId, roomId);
   }
   static getAllUserRoom(id) {
-    const url = `api/v1/userRoom/getAllUserRoom/${id}`;
+    const url = `api/v1/userRoom/getUserRoomById/${id}`;
     return axiosClient.get(url)
   }
 }

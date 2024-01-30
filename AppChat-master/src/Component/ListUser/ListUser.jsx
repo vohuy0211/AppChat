@@ -68,7 +68,7 @@ const ListUser = () => {
             await RoomAPI.createRoom({ userId: userLoinId.id, receiverId: receiverId })
             const roomId = await ChatAPI.getRoomById(userLoinId.id, receiverId)
 
-            await RoomAPI.createUserRoom({ userId: receiverId, roomId: roomId.data.data.id })
+            await RoomAPI.createUserRoom({ userIds: [userLoinId.id, receiverId], roomId: roomId.data.data.id })
             await handleGetUserRoom();
 
             setIsModalVisible(!isModalVisible);
@@ -81,8 +81,6 @@ const ListUser = () => {
     const handleModalToggle = () => {
         setIsModalVisible(!isModalVisible);
     };
-
-    console.log(userRoom);
 
     return (
         <div className={styles.wrapperListUser}>
@@ -98,7 +96,6 @@ const ListUser = () => {
                 pauseOnHover
                 theme="light"
             />
-            {/* Same as */}
             <ToastContainer />
             <div className={styles.create}>
                 <input placeholder='Tìm kiếm người dùng' />
@@ -125,12 +122,12 @@ const ListUser = () => {
             <hr></hr>
             <ul>
                 {userRoom.map((room) => {
-                    const otherUser = room.Room.Users.find(u => u.id !== userLoinId.id);
-                    return (
+                    const otherUser = room.Users.find(u => u.id !== userLoinId.id);
+                    return otherUser ? (
                         <li key={room.id} onClick={() => handleNavigateRoom(otherUser.id)}>
                             <h3>{otherUser.username}</h3>
                         </li>
-                    );
+                    ) : null;
                 })}
             </ul>
             <div className={styles.logout}>
