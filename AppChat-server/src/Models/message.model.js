@@ -14,6 +14,10 @@ const Message = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    }
   },
   {
     timestamps: true,

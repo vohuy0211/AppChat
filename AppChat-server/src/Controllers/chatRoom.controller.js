@@ -44,7 +44,7 @@ class chatController {
 
       const { count, rows: allMessages } = await Message.findAndCountAll({
         where: { roomId },
-        order: [["createdAt", "ASC"]],
+        order: [["updatedAt", "ASC"]],
         include: [
           {
             model: User,
@@ -87,6 +87,55 @@ class chatController {
       res.status(500).json({
         message: "Có lỗi xảy ra khi lấy tin nhắn",
         error: error.message,
+      });
+    }
+  }
+
+  async handleRecallChat(req, res) {
+    try {
+      const { id } = req.params;
+      const newStatus = req.body.status;
+
+      const message = await Message.findByPk(id);
+
+      if (!message) {
+        return res.status(404).json({ message: "Tin nhắn không tồn tại" });
+      }
+
+      message.status = newStatus;
+      await message.save();
+
+      res.status(200).json({
+        message: "Tin nhắn đã được cập nhật thành công",
+        data: message,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "Có lỗi xảy ra khi cập nhật tin nhắn",
+        error: error.message,
+      });
+    }
+  }
+
+  async getMsgById(req, res) {
+    try {
+      const { id } = req.params;
+
+      const message = await Message.findByPk(id);
+
+      if (!message) {
+        return res.status(404).json({ message: "Message not found" });
+      }
+
+      res.status(200).json({
+        message: "Message retrieved successfully",
+        data: message
+      });
+    } catch (error) {
+      console.error("Error retrieving message:", error);
+      res.status(500).json({
+        message: "An error occurred while retrieving the message",
+        error: error.message
       });
     }
   }

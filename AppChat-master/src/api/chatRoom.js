@@ -7,15 +7,23 @@ export class ChatAPI {
   }
   static getRoomById(userId, receiverId) {
     const url = `api/v1/room/${userId}/${receiverId}`;
-    return axiosClient.get(url)
+    return axiosClient.get(url);
   }
   static getMessagesByIdRoom(id, page = 1) {
     const url = `api/v1/chatRoom/${id}?page=${page}`;
-    return axiosClient.get(url)
+    return axiosClient.get(url);
   }
   static createUserRoom(data) {
     const url = "api/v1/userRoom/createUserRoom";
-    return axiosClient.post(url,data)
+    return axiosClient.post(url,data);
+  }
+  static reCallMsg(id, newStatus) {
+    const url = `api/v1/chatRoom/recallChat/${id}`;
+    return axiosClient.put(url, {status: newStatus});
+  }
+  static getMsgById (id) {
+    const url = `api/v1/chatRoom/getMsgById/${id}`;
+    return axiosClient.get(url);
   }
 }
 

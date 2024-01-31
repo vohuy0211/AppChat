@@ -99,3 +99,32 @@
   outline: none;
 }
 
+.iconDots {
+  margin-left: 10px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.modal {
+  position: fixed;
+  top: 120px;
+  left: 80%;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1000; 
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  color: black;
+}
+
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 500; 
+}
+
+
