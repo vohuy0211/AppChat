@@ -3,14 +3,38 @@ import models from "../Models/index.js";
 const { User, Room, UserRoom, Message } = models;
 
 class chatController {
+  async upLoadImg(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).send('Không có file nào được tải lên.');
+      }
+      res.status(200).json({
+        message: 'Tải lên thành công',
+        data: req.file.path || req.file.url
+      });
+    } catch (error) {
+      console.error('Lỗi khi tải hình ảnh:', error);
+      res.status(500).json({
+        message: 'Có lỗi xảy ra khi tải hình ảnh',
+        error: error.message,
+      });
+    }
+  }
+
   async handlePostChat(req, res) {
     try {
       const { text, userId, roomId } = req.body;
+      let imageUrl = null;
+
+      if (req.file) {
+        imageUrl = req.file.path;
+      }
 
       const newMessage = await Message.create({
         text,
         userId,
         roomId,
+        img: imageUrl,
       });
 
       req.app.get("io").emit("chatMessage", newMessage);
@@ -95,12 +119,17 @@ class chatController {
     try {
       const { id } = req.params;
       const newStatus = req.body.status;
+      // const currentUserId = req.userId;
 
       const message = await Message.findByPk(id);
 
       if (!message) {
         return res.status(404).json({ message: "Tin nhắn không tồn tại" });
       }
+
+      // if (message.userId !== currentUserId) {
+      //   return res.status(403).json({ message: "Bạn không có quyền gỡ tin nhắn này" });
+      // }
 
       message.status = newStatus;
       await message.save();

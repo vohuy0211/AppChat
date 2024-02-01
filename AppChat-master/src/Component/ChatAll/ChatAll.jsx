@@ -19,6 +19,7 @@ function ChatAll() {
   const [dataMsg, setDataMsg] = useState([]);
   const [newMessageFromOthers, setNewMessageFromOthers] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentMsgId, setCurrentMsgId] = useState(null);
 
   const handleGetAllMsg = async (currentPage) => {
     try {
@@ -97,31 +98,39 @@ function ChatAll() {
     }
   };
 
-  const handleModalToggle = () => {
+  const handleModalToggle = (msgId = null) => {
+    setCurrentMsgId(msgId);
     setIsModalVisible(!isModalVisible);
   };
 
-  const handleReCallMsg = async (msgId) => {
+  const handleReCallMsg = async (currentMsgId) => {
     try {
-      console.log(msgId);
-      const response = await ChatAPI.getMsgById(msgId);
+      // console.log(currentMsgId);
+      const response = await ChatAPI.getMsgById(currentMsgId);
       const messageData = response.data.data;
-      console.log(messageData);
+      console.log(messageData.id);
+
+      if (userId.id !== messageData.userId) {
+        toast.error("bạn không có quyền thu hồi tin nhắn này");
+        return setIsModalVisible(!isModalVisible);
+      }
+
       if (messageData.status === 0) {
         const newStatus = 1;
-        await ChatAPI.reCallMsg(msgId, newStatus);
+        await ChatAPI.reCallMsg(currentMsgId, newStatus);
 
         const updatedMessages = dataMsg.map(msg =>
-          msg.id === msgId ? { ...msg, newStatus } : msg
+          msg.id === currentMsgId ? { ...msg, newStatus } : msg
         );
         setDataMsg(updatedMessages);
 
         toast.info("Tin nhắn đã được thu hồi.");
       }
+      handleGetAllMsg()
       setIsModalVisible(!isModalVisible);
     } catch (error) {
       console.error("Error recalling message:", error);
-      toast.error("Có lỗi xảy ra khi thu hồi tin nhắn.");
+      toast.error("bạn không có quyền thu hồi tin nhắn này");
     }
   }
 
@@ -144,24 +153,26 @@ function ChatAll() {
                 ? msg.text
                 : <i>Tin nhắn đã được thu hồi</i>
             }
-            <BsThreeDots
-              className={styles.iconDots}
-              onClick={handleModalToggle}
-            />
-            {
-              isModalVisible && (
-                <>
-                  <div className={styles.modalBackdrop} onClick={handleModalToggle}></div>
-                  <div className={styles.modal}>
-                    <button onClick={() => handleReCallMsg(msg.id)}>Thu hồi tin nhắn</button>
-                    <button>Phản hồi tin nhắn</button>
-                  </div>
-                </>
-              )
-            }
+            {msg.status === 0 && (
+              <BsThreeDots
+                className={styles.iconDots}
+                onClick={() => handleModalToggle(msg.id)}
+              />
+            )}
             <h6>{formatTime(msg.createdAt)}</h6>
           </div>
         ))}
+        {
+          isModalVisible && currentMsgId && (
+            <>
+              <div className={styles.modalBackdrop} onClick={handleModalToggle}></div>
+              <div className={styles.modal}>
+                <button onClick={() => handleReCallMsg(currentMsgId)}>Thu hồi tin nhắn</button>
+                <button>Phản hồi tin nhắn</button>
+              </div>
+            </>
+          )
+        }
       </div>
       <hr></hr>
       <div className={styles.sendMessages}>

@@ -17,6 +17,9 @@ const Message = sequelize.define(
     status: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+    },
+    img : {
+      type: DataTypes.STRING,
     }
   },
   {
