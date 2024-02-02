@@ -5,6 +5,7 @@ const { User, Room, UserRoom, Message } = models;
 class chatController {
   async upLoadImg(req, res) {
     try {
+      console.log("haha",req.file);
       if (!req.file) {
         return res.status(400).send('Không có file nào được tải lên.');
       }
@@ -30,6 +31,9 @@ class chatController {
         imageUrl = req.file.path;
       }
 
+      console.log("rì quét nè",req.body);
+      console.log("ảnh nè cường",req.file);
+
       const newMessage = await Message.create({
         text,
         userId,
@@ -39,7 +43,7 @@ class chatController {
 
       req.app.get("io").emit("chatMessage", newMessage);
 
-      const room = await Room.findOne({ where: roomId });
+      const room = await Room.findOne({ where: { id: roomId } });
 
       if (room) {
         room.lastMessage = new Date();

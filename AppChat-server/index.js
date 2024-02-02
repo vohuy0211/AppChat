@@ -5,11 +5,15 @@ import Routes from "./src/Routes/index.js"
 import { Server } from "socket.io";
 import http from "http";
 import sequelize from "./src/libs/connect.mySQL.js"
+import multer from "multer";
+import bodyParser from "body-parser";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(multer().any());
+app.use(bodyParser.urlencoded({extended: true}))
 
 const server = http.createServer(app);
 const io = new Server().listen(server)
