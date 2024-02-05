@@ -5,7 +5,7 @@ const { User, Room, UserRoom, Message } = models;
 class chatController {
   async upLoadImg(req, res) {
     try {
-      console.log("haha",req.file);
+      console.log("haha", req.file);
       if (!req.file) {
         return res.status(400).send('Không có file nào được tải lên.');
       }
@@ -24,21 +24,22 @@ class chatController {
 
   async handlePostChat(req, res) {
     try {
-      const { text, userId, roomId } = req.body;
-      let imageUrl = null;
+      const { text, userId, roomId, replyId } = req.body;
+      // let imageUrl = null;
 
-      if (req.file) {
-        imageUrl = req.file.path;
-      }
+      // if (req.file) {
+      //   imageUrl = req.file.path;
+      // }
 
-      console.log("rì quét nè",req.body);
-      console.log("ảnh nè cường",req.file);
+      console.log("rì quét nè", req.body);
+      console.log("ảnh nè cường", req.file);
 
       const newMessage = await Message.create({
         text,
         userId,
         roomId,
-        img: imageUrl,
+        replyId
+        // img: imageUrl,
       });
 
       req.app.get("io").emit("chatMessage", newMessage);
@@ -68,7 +69,7 @@ class chatController {
       const { roomId } = req.params;
 
       const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 8;
+      const limit = parseInt(req.query.limit) || 6;
 
       const { count, rows: allMessages } = await Message.findAndCountAll({
         where: { roomId },
@@ -126,6 +127,8 @@ class chatController {
       // const currentUserId = req.userId;
 
       const message = await Message.findByPk(id);
+
+      req.app.get("io").emit("reCallMsg", message);
 
       if (!message) {
         return res.status(404).json({ message: "Tin nhắn không tồn tại" });

@@ -18,8 +18,12 @@ const Message = sequelize.define(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
-    img : {
+    img: {
       type: DataTypes.STRING,
+    },
+    replyId: {
+      type: DataTypes.STRING,
+      allowNull: true,
     }
   },
   {

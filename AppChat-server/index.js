@@ -12,7 +12,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(multer().any());
+// app.use(multer().any());
 app.use(bodyParser.urlencoded({extended: true}))
 
 const server = http.createServer(app);

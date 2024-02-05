@@ -20,6 +20,7 @@ function ChatAll() {
   const [newMessageFromOthers, setNewMessageFromOthers] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentMsgId, setCurrentMsgId] = useState(null);
+  const [replyToMessage, setReplyToMessage] = useState(null);
 
   const handleGetAllMsg = async (currentPage) => {
     try {
@@ -45,10 +46,12 @@ function ChatAll() {
         text: newMessage,
         userId: userId.id,
         roomId: parseInt(id),
+        replyId: replyToMessage ? replyToMessage.id : null
       });
 
       setDataMsg([...dataMsg, response.data.data]);
       setNewMessage("");
+      setReplyToMessage(null);
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -103,9 +106,14 @@ function ChatAll() {
     setIsModalVisible(!isModalVisible);
   };
 
+  const handleReplyToMessage = (msg) => {
+    setIsModalVisible(false);
+    setReplyToMessage(msg);
+    console.log(msg);
+  };
+
   const handleReCallMsg = async (currentMsgId) => {
     try {
-      // console.log(currentMsgId);
       const response = await ChatAPI.getMsgById(currentMsgId);
       const messageData = response.data.data;
       console.log(messageData.id);
@@ -123,16 +131,29 @@ function ChatAll() {
           msg.id === currentMsgId ? { ...msg, newStatus } : msg
         );
         setDataMsg(updatedMessages);
-
-        toast.info("Tin nhắn đã được thu hồi.");
       }
-      handleGetAllMsg()
       setIsModalVisible(!isModalVisible);
     } catch (error) {
       console.error("Error recalling message:", error);
       toast.error("bạn không có quyền thu hồi tin nhắn này");
     }
   }
+
+  useEffect(() => {
+    socket.on("reCallMsg", (message) => {
+      console.log(message);
+      setDataMsg((currentMessages) =>
+        currentMessages.map((msg) =>
+          msg.id === message ? { ...msg, status: 1, text: "Tin nhắn đã được thu hồi" } : msg
+        )
+      );
+      handleGetAllMsg()
+      return () => {
+        socket.off("messageRecalled");
+      };
+    })
+  }, [socket])
+
 
   return (
     <div className={styles.wrapperListChat}>
@@ -145,34 +166,53 @@ function ChatAll() {
       </div>
       <hr></hr>
       <div className={styles.chatContent} onWheel={handleWheelScroll}>
-        {dataMsg.map((msg, index) => (
-          <div key={index} className={msg.userId === userId.id ? styles.messageReceiver : styles.messageSender}>
-            {msg.User && msg.User.username} :
-            {
-              msg.status === 0
-                ? msg.text
-                : <i>Tin nhắn đã được thu hồi</i>
-            }
-            {msg.status === 0 && (
-              <BsThreeDots
-                className={styles.iconDots}
-                onClick={() => handleModalToggle(msg.id)}
-              />
-            )}
-            <h6>{formatTime(msg.createdAt)}</h6>
-          </div>
-        ))}
+        {dataMsg.map((msg, index) => {
+          const originalMsg = msg.replyId ? dataMsg.find(m => m.id === msg.replyId) : null;
+          return (
+            <div key={index} className={msg.userId === userId.id ? styles.messageReceiver : styles.messageSender}>
+              {originalMsg && (
+                <div className={styles.originalMessage}>
+                  Replying to: {originalMsg.text}
+                </div>
+              )}
+              {msg.User && msg.User.username} :
+              {
+                msg.status === 0
+                  ? msg.text
+                  : <i>Tin nhắn đã được thu hồi</i>
+              }
+              {msg.status === 0 && (
+                <BsThreeDots
+                  className={styles.iconDots}
+                  onClick={() => handleModalToggle(msg.id)}
+                />
+              )}
+              <h6>{formatTime(msg.createdAt)}</h6>
+            </div>
+          );
+        })}
         {
           isModalVisible && currentMsgId && (
             <>
               <div className={styles.modalBackdrop} onClick={handleModalToggle}></div>
               <div className={styles.modal}>
                 <button onClick={() => handleReCallMsg(currentMsgId)}>Thu hồi tin nhắn</button>
-                <button>Phản hồi tin nhắn</button>
+                <button onClick={() => {
+                  const msgToReply = dataMsg.find(msg => msg.id === currentMsgId);
+                  handleReplyToMessage(msgToReply);
+                }}>Phản hồi tin nhắn</button>
               </div>
             </>
           )
         }
+      </div>
+      <div className={styles.replyToMessage}>
+        {replyToMessage && (
+          <>
+            <p>Replying to: {replyToMessage.text}</p>
+            <button onClick={() => setReplyToMessage(null)}>Cancel</button>
+          </>
+        )}
       </div>
       <hr></hr>
       <div className={styles.sendMessages}>

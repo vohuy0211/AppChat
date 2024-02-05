@@ -127,4 +127,11 @@
   z-index: 500; 
 }
 
+.replyToMessage {
+  display: flex;
+  align-items: center;
+  border: 1px solid white;
+  justify-content: space-around
+}
+
 

@@ -18,6 +18,9 @@ Room.hasMany(UserRoom)
 User.belongsToMany(Room, { through: UserRoom, foreignKey: 'userId' });
 Room.belongsToMany(User, { through: UserRoom, foreignKey: 'roomId' });
 
+Message.belongsTo(Message, { as: 'Reply', foreignKey: 'replyId' });
+Message.hasMany(Message, { as: 'Replies', foreignKey: 'replyId' });
+
 Promise.all([
     User.sync(),
     UserRoom.sync(),
