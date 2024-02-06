@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import styles from "./ChatAll.module.css"
+ import styles from "./ChatAll.module.css"
 import { ChatAPI } from "../../api/chatRoom";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
@@ -21,6 +21,15 @@ function ChatAll() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentMsgId, setCurrentMsgId] = useState(null);
   const [replyToMessage, setReplyToMessage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImageChange = (e) => {
+    if (e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    }
+  };
+
+  console.log(selectedImage);
 
   const handleGetAllMsg = async (currentPage) => {
     try {
@@ -41,17 +50,22 @@ function ChatAll() {
   const userId = JSON.parse(localStorage.getItem('user'));
 
   const sendMessage = async (id) => {
-    try {
-      const response = await ChatAPI.sendMessage({
-        text: newMessage,
-        userId: userId.id,
-        roomId: parseInt(id),
-        replyId: replyToMessage ? replyToMessage.id : null
-      });
+    if (!selectedImage && !newMessage) {
+      return  toast.error("lỗi");
+    };
 
-      setDataMsg([...dataMsg, response.data.data]);
+    const formData = new FormData();
+    formData.append('text', newMessage);
+    formData.append('userId', userId.id);
+    formData.append('roomId', parseInt(id));
+    formData.append('replyId', replyToMessage ? replyToMessage.id : null);
+    formData.append('img', selectedImage);
+    try {
+      const response = await ChatAPI.sendMessage(formData);
+      console.log(response);
       setNewMessage("");
       setReplyToMessage(null);
+      setSelectedImage(null)
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -59,9 +73,9 @@ function ChatAll() {
 
   useEffect(() => {
     socket.on("chatMessage", (message) => {
+      console.log(message);
       if (message.userId !== userId.id) {
         setNewMessageFromOthers(true);
-        toast.info(`Bạn có một tin nhắn mới!`);
       }
       handleGetAllMsg()
       setNewMessage("");
@@ -219,6 +233,11 @@ function ChatAll() {
         <input placeholder='Send Messages'
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+        />
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
         />
         <button onClick={() => sendMessage(id)}>
           Send

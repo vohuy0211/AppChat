@@ -5,7 +5,7 @@ import { multerUpload } from './../config/multer.js';
 
 const chatRouter = express.Router();
 
-chatRouter.post("/postChat", chatController.handlePostChat);
+chatRouter.post("/postChat", multerUpload.single('img'), chatController.handlePostChat);
 chatRouter.get("/:roomId", chatController.handleGetMessagesById);
 chatRouter.put("/recallChat/:id", chatController.handleRecallChat);
 chatRouter.get("/getMsgById/:id", chatController.getMsgById);

@@ -25,11 +25,11 @@ class chatController {
   async handlePostChat(req, res) {
     try {
       const { text, userId, roomId, replyId } = req.body;
-      // let imageUrl = null;
+      let imageUrl = null;
 
-      // if (req.file) {
-      //   imageUrl = req.file.path;
-      // }
+      if (req.file) {
+        imageUrl = req.file.path || req.file.url;
+      }
 
       console.log("rì quét nè", req.body);
       console.log("ảnh nè cường", req.file);
@@ -38,8 +38,8 @@ class chatController {
         text,
         userId,
         roomId,
-        replyId
-        // img: imageUrl,
+        replyId,
+        img: imageUrl,
       });
 
       req.app.get("io").emit("chatMessage", newMessage);
