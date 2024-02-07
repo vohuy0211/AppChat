@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
- import styles from "./ChatAll.module.css"
+import styles from "./ChatAll.module.css"
 import { ChatAPI } from "../../api/chatRoom";
 import { io } from "socket.io-client";
 import { useParams } from "react-router-dom";
@@ -23,14 +23,6 @@ function ChatAll() {
   const [replyToMessage, setReplyToMessage] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const handleImageChange = (e) => {
-    if (e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
-    }
-  };
-
-  console.log(selectedImage);
-
   const handleGetAllMsg = async (currentPage) => {
     try {
       const response = await ChatAPI.getMessagesByIdRoom(id, currentPage);
@@ -49,20 +41,31 @@ function ChatAll() {
 
   const userId = JSON.parse(localStorage.getItem('user'));
 
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedImage(e.target.files[0]);
+    } else {
+      setSelectedImage(null);
+    }
+  };
+
+
   const sendMessage = async (id) => {
     if (!selectedImage && !newMessage) {
-      return  toast.error("lỗi");
+      return toast.error("lỗi");
     };
+    console.log(selectedImage);
 
     const formData = new FormData();
     formData.append('text', newMessage);
     formData.append('userId', userId.id);
     formData.append('roomId', parseInt(id));
-    formData.append('replyId', replyToMessage ? replyToMessage.id : null);
-    formData.append('img', selectedImage);
+    if (replyToMessage) formData.append('replyId', replyToMessage.id);
+    if (selectedImage) formData.append('img', selectedImage);
+
     try {
+      console.log(formData);
       const response = await ChatAPI.sendMessage(formData);
-      console.log(response);
       setNewMessage("");
       setReplyToMessage(null);
       setSelectedImage(null)
@@ -73,7 +76,6 @@ function ChatAll() {
 
   useEffect(() => {
     socket.on("chatMessage", (message) => {
-      console.log(message);
       if (message.userId !== userId.id) {
         setNewMessageFromOthers(true);
       }
